@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Clock</title>
+		<style>
+			canvas {
+				position: absolute;
+				top:0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				margin:auto;
+			}
+			
+			p {
+				text-align: center;
+				padding: 10px;
+				font-family: Georgia;
+				font-size: 35px;		
+			}
+		</style>
+	</head>
+	
+	
+	<body>
+		<p id="time"></p>
+		<canvas width="500px" height="500px" id="workspace">Your browser doesn't support canvas.</canvas>
+		
+		<script>
+			function setDigitalTime() {
+				var string = document.getElementById("time");
+				var AMPM;
+				var hour = new Date().getHours();
+				if(hour > 12) {
+					AMPM = "PM";
+				} else {
+					AMPM = "AM";
+				}
+				var minute = new Date().getMinutes();
+				if(minute < 10) {
+					minute = "0" + minute;
+				}
+				var second = new Date().getSeconds();
+				if(second < 10) {
+					second = "0" + second;
+				}
+				hour = hour % 12;
+				hour = hour ? hour : 12;
+				if(hour < 10) {
+					hour = "0" + hour;
+				}
+				var time = hour + " : " + minute + " : " + second;
+				string.innerHTML = "Current Time (" + AMPM + ")<br>" + time;
+			}
+			
+			function setTime() {
+				var canvas = document.getElementById("workspace");
+				var content = canvas.getContext("2d");
+				var radius = canvas.width / 2;
+
+				this.drawCircle(250, 250, radius, "#000");
+				this.drawCircle(250, 250, 10, "#fff");
+			
+				content.font = radius / 10 + "px Georgia";
+				content.textAlign = "center";
+				content.textBaseline = "middle";
+
+				for(var i = 1; i <= 12; i++) {
+					content.fillText(
+						i, 
+						radius + radius * 0.9 * Math.sin(i * 2 * Math.PI / 12), 
+						radius - radius * 0.9 * Math.cos(i * 2 * Math.PI / 12)
+					);
+				}
+
+				var hours = new Date().getHours();
+				var minutes = new Date().getMinutes();
+				var seconds = new Date().getSeconds();
+
+				var fullHours = hours % 12 + minutes / 60 + seconds / 3600;
+
+				var hoursAngle = fullHours * 2 * Math.PI / 12;
+				var minutesAngle = minutes * 2 * Math.PI / 60;
+				var secondsAngle = seconds * 2 * Math.PI / 60;
+				
+				this.setLine(radius, hoursAngle, 0.5, 5);
+				this.setLine(radius, minutesAngle, 0.7, 2);
+				this.setLine(radius, secondsAngle, 0.8, 2);
+			}
+			
+			function setLine(radius, angle, length, linewidth) {
+				var canvas = document.getElementById("workspace");
+				var content = canvas.getContext("2d");
+				content.strokeStyle = "#fff";
+				content.moveTo(radius, radius);
+				content.lineTo(
+					radius + (radius * length * Math.sin(angle)),
+					radius - (radius * length * Math.cos(angle))	
+				);
+				content.lineWidth = linewidth;
+				content.stroke();
+			}
+			
+			function drawCircle(x, y, radius, color) {
+				var canvas = document.getElementById("workspace");
+				var content = canvas.getContext("2d");
+				content.beginPath();
+				content.arc(x, y, radius, 0, 2*Math.PI);
+				content.stroke();
+				content.fillStyle = color;
+				content.fill();
+			}
+			
+			setInterval(setTime, 1000);
+			setInterval(setDigitalTime, 1000);
+		</script>
+	</body>
+</html>
